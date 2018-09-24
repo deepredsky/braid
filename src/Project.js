@@ -2,6 +2,8 @@ import React, { Component, createContext } from 'react';
 import { getCurrentIteration, getMemberships } from './api';
 import Story from './Story';
 import Spinner from './Spinner';
+import Owners from './Owners';
+import normalize from './normalize';
 
 const { Consumer, Provider } = createContext();
 
@@ -44,17 +46,16 @@ class Project extends Component {
       stories: [],
       isLoading: true,
       error: null,
-      people: []
+      people: [],
+      uniqueOwners: []
     });
     Promise.all([getCurrentIteration(id), getMemberships(id)])
       .then(([iterationResponse, membershipsResponse]) => {
-        const iteration = { ...iterationResponse[0], stories: null };
-        const people = membershipsResponse.map(item => item.person);
-
         this.setState({
-          iteration,
-          people,
-          stories: iterationResponse[0].stories,
+          ...normalize({
+            iterationResponse,
+            membershipsResponse
+          }),
           isLoading: false
         });
       })
@@ -62,7 +63,7 @@ class Project extends Component {
   };
 
   render() {
-    const { isLoading, error, stories, people } = this.state;
+    const { isLoading, error, stories, people, uniqueOwners } = this.state;
 
     if (isLoading) {
       return <Spinner />;
@@ -73,6 +74,9 @@ class Project extends Component {
 
     return (
       <Provider value={people}>
+        <section className="section">
+          <Owners ownerIds={uniqueOwners} />
+        </section>
         <section className="section">
           <div className="columns">
             <Column title="Pending" state={['planned']} stories={stories} />
