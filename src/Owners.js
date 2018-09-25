@@ -3,10 +3,15 @@ import { Consumer } from './Project';
 
 const Owners = ({ ownerIds }) => (
   <Consumer>
-    {people => (
+    {({ people, activeOwner }) => (
       <div className="tags is-marginless">
         {people.filter(person => ownerIds.includes(person.id)).map(owner => (
-          <div className="tag is-rounded uppercase" key={owner.id}>
+          <div
+            className={`tag is-rounded uppercase ${
+              activeOwner === owner.id ? 'is-warning' : ''
+            }`}
+            key={owner.id}
+          >
             {owner.initials}
           </div>
         ))}

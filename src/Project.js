@@ -2,7 +2,7 @@ import React, { Component, createContext } from 'react';
 import { getCurrentIteration, getMemberships } from './api';
 import Story from './Story';
 import Spinner from './Spinner';
-import Owners from './Owners';
+import ActiveOwners from './ActiveOwners';
 import normalize from './normalize';
 
 const { Consumer, Provider } = createContext();
@@ -27,7 +27,8 @@ class Project extends Component {
     error: null,
     iteration: {},
     stories: [],
-    people: []
+    people: [],
+    activeOwner: null
   };
 
   componentDidMount() {
@@ -62,8 +63,25 @@ class Project extends Component {
       .catch(error => this.setState({ error, isLoading: false }));
   };
 
+  setActiveOwner = id => {
+    this.setState(state => {
+      if (state.activeOwner === id) {
+        return { activeOwner: null };
+      }
+
+      return { activeOwner: id };
+    });
+  };
+
   render() {
-    const { isLoading, error, stories, people, uniqueOwners } = this.state;
+    const {
+      isLoading,
+      error,
+      stories,
+      people,
+      uniqueOwners,
+      activeOwner
+    } = this.state;
 
     if (isLoading) {
       return <Spinner />;
@@ -73,10 +91,9 @@ class Project extends Component {
     }
 
     return (
-      <Provider value={people}>
-        <section className="section">
-          <Owners ownerIds={uniqueOwners} />
-        </section>
+      <Provider value={{ people, activeOwner }}>
+        <ActiveOwners ownerIds={uniqueOwners} onClick={this.setActiveOwner} />
+
         <section className="section">
           <div className="columns">
             <Column title="Pending" state={['planned']} stories={stories} />
