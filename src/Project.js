@@ -2,7 +2,7 @@ import React, { Component, createContext } from 'react';
 import { getCurrentIteration, getMemberships } from './api';
 import Story from './Story';
 import Spinner from './Spinner';
-import ActiveOwners from './ActiveOwners';
+import Filters from './Filters';
 import normalize from './normalize';
 
 const { Consumer, Provider } = createContext();
@@ -92,8 +92,6 @@ class Project extends Component {
 
     return (
       <Provider value={{ people, activeOwner }}>
-        <ActiveOwners ownerIds={uniqueOwners} onClick={this.setActiveOwner} />
-
         <section className="section">
           <div className="columns">
             <Column title="Pending" state={['planned']} stories={stories} />
@@ -106,6 +104,7 @@ class Project extends Component {
             />
           </div>
         </section>
+        <Filters />
       </Provider>
     );
   }
